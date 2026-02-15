@@ -8,12 +8,12 @@ datasource db {
 }
 
 model User {
-  id                 String    @id @default(cuid())
-  clerkId            String    @unique
-  email              String
-  subscriptionStatus String    @default("inactive") // "active" | "inactive"
-  stripeCustomerId   String?   @unique
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  deletedAt          DateTime?
+  id              String    @id @default(cuid())
+  clerkId         String    @unique
+  email           String
+  stripeApiKey    String?   @db.Text
+  stripeConnected Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
 }
