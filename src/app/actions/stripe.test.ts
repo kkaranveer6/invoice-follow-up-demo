@@ -57,7 +57,7 @@ describe('connectStripeAccount', () => {
   })
 
   it('returns error if key does not start with sk_', async () => {
-    vi.mocked(currentUser).mockResolvedValue({ id: 'clerk_1' } as any)
+    vi.mocked(currentUser).mockResolvedValue({ id: 'clerk_1' } as unknown as Awaited<ReturnType<typeof currentUser>>)
     vi.mocked(db.user.findUniqueOrThrow).mockResolvedValue(mockUser)
 
     const result = await connectStripeAccount('pk_test_abc')
@@ -68,7 +68,7 @@ describe('connectStripeAccount', () => {
   })
 
   it('returns error if Stripe API key is invalid', async () => {
-    vi.mocked(currentUser).mockResolvedValue({ id: 'clerk_1' } as any)
+    vi.mocked(currentUser).mockResolvedValue({ id: 'clerk_1' } as unknown as Awaited<ReturnType<typeof currentUser>>)
     vi.mocked(db.user.findUniqueOrThrow).mockResolvedValue(mockUser)
     mockRetrieve.mockRejectedValue(new Error('Invalid API Key'))
 
@@ -80,7 +80,7 @@ describe('connectStripeAccount', () => {
   })
 
   it('encrypts key and saves on success', async () => {
-    vi.mocked(currentUser).mockResolvedValue({ id: 'clerk_1' } as any)
+    vi.mocked(currentUser).mockResolvedValue({ id: 'clerk_1' } as unknown as Awaited<ReturnType<typeof currentUser>>)
     vi.mocked(db.user.findUniqueOrThrow).mockResolvedValue(mockUser)
     mockRetrieve.mockResolvedValue({ id: 'acct_123' })
 
@@ -111,7 +111,7 @@ describe('disconnectStripeAccount', () => {
   })
 
   it('clears Stripe key and sets stripeConnected to false', async () => {
-    vi.mocked(currentUser).mockResolvedValue({ id: 'clerk_1' } as any)
+    vi.mocked(currentUser).mockResolvedValue({ id: 'clerk_1' } as unknown as Awaited<ReturnType<typeof currentUser>>)
     vi.mocked(db.user.findUniqueOrThrow).mockResolvedValue({
       ...mockUser,
       stripeApiKey: 'encrypted_key_data',

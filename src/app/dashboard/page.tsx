@@ -1,6 +1,9 @@
 import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { LayoutDashboard, CreditCard, FileText } from 'lucide-react'
 
 export default async function DashboardPage() {
   const user = await currentUser()
@@ -14,12 +17,58 @@ export default async function DashboardPage() {
     redirect('/dashboard/settings')
   }
 
+  const displayName = user.firstName ?? dbUser.email
+
   return (
     <div>
-      <h2 className="text-2xl font-bold">Dashboard</h2>
-      <p className="mt-2 text-gray-600">
-        Welcome, {user.firstName ?? dbUser.email}
+      <h1 className="font-heading text-2xl font-bold text-slate-900">
+        Dashboard
+      </h1>
+      <p className="mt-1 text-sm text-slate-600">
+        Welcome back, {displayName}
       </p>
+
+      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">
+              Stripe Status
+            </CardTitle>
+            <CreditCard className="h-4 w-4 text-slate-400" />
+          </CardHeader>
+          <CardContent>
+            <Badge variant="default" className="bg-green-100 text-green-700 hover:bg-green-100">
+              Connected
+            </Badge>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">
+              Invoices Synced
+            </CardTitle>
+            <FileText className="h-4 w-4 text-slate-400" />
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-slate-900">&mdash;</p>
+            <p className="mt-1 text-xs text-slate-500">Coming soon</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">
+              Reminders Sent
+            </CardTitle>
+            <LayoutDashboard className="h-4 w-4 text-slate-400" />
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-slate-900">&mdash;</p>
+            <p className="mt-1 text-xs text-slate-500">Coming soon</p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

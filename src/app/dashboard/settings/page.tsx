@@ -6,6 +6,12 @@ import {
   connectStripeAccount,
   disconnectStripeAccount,
 } from '@/app/actions/stripe'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertCircle, CheckCircle2 } from 'lucide-react'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -56,51 +62,64 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold">Settings</h2>
+      <h1 className="font-heading text-2xl font-bold text-slate-900">
+        Settings
+      </h1>
+      <p className="mt-1 text-sm text-slate-600">
+        Manage your account and integrations.
+      </p>
 
-      <div className="mt-8 max-w-lg rounded-lg border bg-white p-6">
-        <h3 className="text-lg font-semibold">Stripe Connection</h3>
-        <p className="mt-1 text-sm text-gray-600">
-          Paste your Stripe secret key to connect your account. Your key is
-          encrypted before storage.
-        </p>
+      <Card className="mt-8 max-w-lg">
+        <CardHeader>
+          <CardTitle className="font-heading">Stripe Connection</CardTitle>
+          <CardDescription>
+            Paste your Stripe secret key to connect your account. Your key is
+            encrypted before storage.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleConnect}>
+            <div className="space-y-2">
+              <Label htmlFor="apiKey">Stripe Secret Key</Label>
+              <Input
+                id="apiKey"
+                type="password"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="sk_test_..."
+                required
+              />
+            </div>
 
-        <form onSubmit={handleConnect} className="mt-4">
-          <label htmlFor="apiKey" className="block text-sm font-medium">
-            Stripe Secret Key
-          </label>
-          <input
-            id="apiKey"
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="sk_test_..."
-            className="mt-1 w-full rounded-md border px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-            required
-          />
+            {error && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            {success && (
+              <Alert className="mt-4 border-green-200 bg-green-50 text-green-800">
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                <AlertDescription>{success}</AlertDescription>
+              </Alert>
+            )}
 
-          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-          {success && <p className="mt-2 text-sm text-green-600">{success}</p>}
-
-          <div className="mt-4 flex gap-3">
-            <button
-              type="submit"
-              disabled={loading || !apiKey}
-              className="rounded-md bg-black px-4 py-2 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
-            >
-              {loading ? 'Connecting...' : 'Connect Stripe'}
-            </button>
-            <button
-              type="button"
-              onClick={handleDisconnect}
-              disabled={loading}
-              className="rounded-md border px-4 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
-            >
-              Disconnect
-            </button>
-          </div>
-        </form>
-      </div>
+            <div className="mt-6 flex gap-3">
+              <Button type="submit" disabled={loading || !apiKey}>
+                {loading ? 'Connecting...' : 'Connect Stripe'}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleDisconnect}
+                disabled={loading}
+              >
+                Disconnect
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }
