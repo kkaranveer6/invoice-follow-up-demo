@@ -1,18 +1,4 @@
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: invoice-followup-mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: invoice_followup
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: apppassword
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-
   postgres:
     image: postgres:16
     container_name: invoice-followup-postgres
@@ -25,7 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
 
 volumes:
-  mysql_data:
   postgres_data:
