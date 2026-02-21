@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "worker": "tsx worker.ts",
+    "seed": "tsx scripts/seed.ts",
+    "seed:reset": "tsx scripts/seed.ts --reset",
+    "trigger-test": "tsx scripts/trigger-test.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.37.4",
@@ -20,14 +24,19 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.564.0",
     "next": "16.1.6",
+    "node-cron": "^4.2.1",
+    "openworkflow": "^0.7.2",
+    "postgres": "^3.4.8",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "resend": "^6.9.2",
     "stripe": "^20.3.1",
     "tailwind-merge": "^3.4.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/node-cron": "^3.0.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
@@ -36,6 +45,7 @@
     "prettier": "^3.8.1",
     "prisma": "^6.19.2",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^3.2.4"
   }

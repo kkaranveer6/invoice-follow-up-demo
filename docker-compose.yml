@@ -13,5 +13,19 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  postgres:
+    image: postgres:16
+    container_name: invoice-followup-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: openworkflow
+      POSTGRES_USER: owuser
+      POSTGRES_PASSWORD: owpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
 volumes:
   mysql_data:
+  postgres_data:
