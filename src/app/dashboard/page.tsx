@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { LayoutDashboard, CreditCard, FileText } from 'lucide-react'
+import { SyncButton } from './_components/SyncButton'
 
 export default async function DashboardPage() {
   const user = await currentUser()
@@ -18,6 +19,11 @@ export default async function DashboardPage() {
   }
 
   const displayName = user.firstName ?? dbUser.email
+
+  const [invoiceCount, remindersSent] = await Promise.all([
+    db.invoice.count({ where: { userId: dbUser.id } }),
+    db.emailLog.count({ where: { invoice: { userId: dbUser.id }, status: 'sent' } }),
+  ])
 
   return (
     <div>
@@ -51,8 +57,10 @@ export default async function DashboardPage() {
             <FileText className="h-4 w-4 text-slate-400" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-slate-900">&mdash;</p>
-            <p className="mt-1 text-xs text-slate-500">Coming soon</p>
+            <p className="text-2xl font-bold text-slate-900">{invoiceCount}</p>
+            <div className="mt-3">
+              <SyncButton lastSyncedAt={dbUser.lastSyncedAt} />
+            </div>
           </CardContent>
         </Card>
 
@@ -64,8 +72,7 @@ export default async function DashboardPage() {
             <LayoutDashboard className="h-4 w-4 text-slate-400" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-slate-900">&mdash;</p>
-            <p className="mt-1 text-xs text-slate-500">Coming soon</p>
+            <p className="text-2xl font-bold text-slate-900">{remindersSent}</p>
           </CardContent>
         </Card>
       </div>

@@ -39,6 +39,7 @@ const mockUser = {
   email: 'test@example.com',
   stripeApiKey: null,
   stripeConnected: false,
+  lastSyncedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   deletedAt: null,
