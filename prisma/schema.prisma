@@ -12,8 +12,10 @@ model User {
   clerkId         String    @unique
   email           String
   stripeApiKey    String?   @db.Text
-  stripeConnected Boolean   @default(false)
-  lastSyncedAt    DateTime?
+  stripeConnected    Boolean   @default(false)
+  stripeCustomerId   String?   @unique
+  subscriptionStatus String    @default("inactive")
+  lastSyncedAt       DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   deletedAt       DateTime?
