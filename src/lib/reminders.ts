@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
 import { sendEmail } from '@/lib/email'
 import { getTemplate, interpolateTemplate } from '@/lib/email-templates'
+import { encrypt } from '@/lib/crypto'
 
 interface Invoice {
   id: string
@@ -53,12 +54,17 @@ export async function processReminders(): Promise<ProcessResult> {
       continue
     }
 
+    const token = encodeURIComponent(encrypt(invoice.id))
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+    const unsubscribeLink = `${appUrl}/api/unsubscribe?token=${token}`
+
     const template = getTemplate(invoice.reminderCount)
     const { subject, body } = interpolateTemplate(template, {
       clientName: invoice.customerName,
       invoiceNumber: invoice.invoiceNumber,
       amount: `${(invoice.amount / 100).toFixed(2)} ${invoice.currency.toUpperCase()}`,
       paymentLink: invoice.paymentLink,
+      unsubscribeLink,
     })
 
     try {

@@ -4,8 +4,10 @@ const mockSendEmail = vi.hoisted(() => vi.fn())
 const mockDbInvoiceFindMany = vi.hoisted(() => vi.fn())
 const mockDbInvoiceUpdate = vi.hoisted(() => vi.fn())
 const mockDbEmailLogCreate = vi.hoisted(() => vi.fn())
+const mockEncrypt = vi.hoisted(() => vi.fn())
 
 vi.mock('@/lib/email', () => ({ sendEmail: mockSendEmail }))
+vi.mock('@/lib/crypto', () => ({ encrypt: mockEncrypt }))
 vi.mock('@/lib/db', () => ({
   db: {
     invoice: {
@@ -101,6 +103,8 @@ describe('needsReminder', () => {
 describe('processReminders', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockEncrypt.mockReturnValue('mock-encrypted-token')
+    process.env.NEXT_PUBLIC_APP_URL = 'https://example.com'
   })
 
   it('sends a reminder and updates DB for qualifying invoice', async () => {
@@ -112,7 +116,12 @@ describe('processReminders', () => {
 
     const result = await processReminders()
 
-    expect(mockSendEmail).toHaveBeenCalledOnce()
+    expect(mockSendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: 'client@example.com',
+        body: expect.stringContaining('https://example.com/api/unsubscribe?token='),
+      }),
+    )
     expect(mockDbInvoiceUpdate).toHaveBeenCalledWith({
       where: { id: 'inv_1' },
       data: {

@@ -11,6 +11,7 @@ interface TemplateVars {
   invoiceNumber: string
   amount: string
   paymentLink: string
+  unsubscribeLink: string
 }
 
 const TEMPLATES: Record<TemplateName, Template> = {
@@ -58,7 +59,7 @@ Regards`,
 const UNSUBSCRIBE_FOOTER = `
 
 ---
-To stop receiving these reminders, reply with "unsubscribe" or contact us directly.`
+To stop receiving these reminders, click here: {{unsubscribeLink}}`
 
 export function getTemplate(reminderCount: number): Template {
   if (reminderCount === 0) return TEMPLATES.friendly
@@ -76,9 +77,10 @@ export function interpolateTemplate(
       .replaceAll('{{invoiceNumber}}', vars.invoiceNumber)
       .replaceAll('{{amount}}', vars.amount)
       .replaceAll('{{paymentLink}}', vars.paymentLink)
+      .replaceAll('{{unsubscribeLink}}', vars.unsubscribeLink)
 
   return {
     subject: replace(template.subject),
-    body: replace(template.body) + UNSUBSCRIBE_FOOTER,
+    body: replace(template.body + UNSUBSCRIBE_FOOTER),
   }
 }
