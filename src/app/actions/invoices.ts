@@ -2,6 +2,7 @@
 
 import { currentUser } from '@clerk/nextjs/server'
 import { InvoiceStatus } from '@prisma/client'
+import { revalidatePath } from 'next/cache'
 import { db } from '@/lib/db'
 import { getStripeClient } from '@/lib/stripe'
 import { markOverdueInvoices } from '@/lib/invoices'
@@ -97,4 +98,48 @@ export async function syncInvoicesAction(): Promise<{
     console.error('syncInvoicesAction error:', err)
     return { error: 'Failed to sync invoices.' }
   }
+}
+
+export async function toggleRemindersAction(
+  invoiceId: string,
+  enabled: boolean,
+): Promise<{ success?: boolean; error?: string }> {
+  const user = await currentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const dbUser = await db.user.findUniqueOrThrow({
+    where: { clerkId: user.id },
+  })
+
+  const invoice = await db.invoice.findFirst({
+    where: { id: invoiceId, userId: dbUser.id },
+  })
+
+  if (!invoice) return { error: 'Invoice not found' }
+
+  await db.invoice.update({
+    where: { id: invoiceId },
+    data: { remindersEnabled: enabled },
+  })
+
+  revalidatePath('/dashboard/invoices')
+  return { success: true }
+}
+
+export async function pauseAllRemindersAction(
+  enabled: boolean,
+): Promise<{ success?: boolean; error?: string }> {
+  const user = await currentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const dbUser = await db.user.findUniqueOrThrow({
+    where: { clerkId: user.id },
+  })
+
+  await db.invoice.updateMany({
+    where: { userId: dbUser.id },
+    data: { remindersEnabled: enabled },
+  })
+
+  return { success: true }
 }

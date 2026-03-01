@@ -9,6 +9,10 @@ const mockMarkOverdueInvoices = vi.hoisted(() => vi.fn())
 
 vi.mock('@clerk/nextjs/server', () => ({ currentUser: mockCurrentUser }))
 
+vi.mock('next/cache', () => ({
+  revalidatePath: vi.fn(),
+}))
+
 vi.mock('@/lib/db', () => ({
   db: {
     user: {
@@ -17,6 +21,9 @@ vi.mock('@/lib/db', () => ({
     },
     invoice: {
       upsert: mockDbInvoiceUpsert,
+      findFirst: vi.fn(),
+      update: vi.fn().mockResolvedValue({}),
+      updateMany: vi.fn().mockResolvedValue({ count: 3 }),
     },
   },
 }))
@@ -31,7 +38,11 @@ vi.mock('@/lib/invoices', () => ({
   markOverdueInvoices: mockMarkOverdueInvoices,
 }))
 
-import { syncInvoicesAction } from './invoices'
+import { syncInvoicesAction, toggleRemindersAction, pauseAllRemindersAction } from './invoices'
+import { currentUser } from '@clerk/nextjs/server'
+import { db } from '@/lib/db'
+
+const mockClerkUser = { id: 'clerk_1' } as unknown as Awaited<ReturnType<typeof currentUser>>
 
 const mockDbUser = {
   id: 'user_1',
@@ -58,6 +69,12 @@ function makeStripeInvoice(overrides: Record<string, unknown> = {}) {
     hosted_invoice_url: 'https://invoice.stripe.com/abc',
     ...overrides,
   }
+}
+
+const mockInvoice = {
+  id: 'inv_1',
+  userId: 'user_1',
+  remindersEnabled: true,
 }
 
 describe('syncInvoicesAction', () => {
@@ -209,5 +226,94 @@ describe('syncInvoicesAction', () => {
     const result = await syncInvoicesAction()
 
     expect(result).toEqual({ error: 'Failed to sync invoices.' })
+  })
+})
+
+describe('toggleRemindersAction', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('returns error if user is not authenticated', async () => {
+    vi.mocked(currentUser).mockResolvedValue(null)
+
+    const result = await toggleRemindersAction('inv_1', false)
+    expect(result).toEqual({ error: 'Not authenticated' })
+  })
+
+  it('returns error if invoice not found or does not belong to user', async () => {
+    vi.mocked(currentUser).mockResolvedValue(mockClerkUser)
+    vi.mocked(db.user.findUniqueOrThrow).mockResolvedValue(mockDbUser as never)
+    vi.mocked(db.invoice.findFirst).mockResolvedValue(null)
+
+    const result = await toggleRemindersAction('inv_999', false)
+    expect(result).toEqual({ error: 'Invoice not found' })
+  })
+
+  it('updates remindersEnabled to false', async () => {
+    vi.mocked(currentUser).mockResolvedValue(mockClerkUser)
+    vi.mocked(db.user.findUniqueOrThrow).mockResolvedValue(mockDbUser as never)
+    vi.mocked(db.invoice.findFirst).mockResolvedValue(mockInvoice as never)
+
+    const result = await toggleRemindersAction('inv_1', false)
+
+    expect(db.invoice.update).toHaveBeenCalledWith({
+      where: { id: 'inv_1' },
+      data: { remindersEnabled: false },
+    })
+    expect(result).toEqual({ success: true })
+  })
+
+  it('updates remindersEnabled to true', async () => {
+    vi.mocked(currentUser).mockResolvedValue(mockClerkUser)
+    vi.mocked(db.user.findUniqueOrThrow).mockResolvedValue(mockDbUser as never)
+    vi.mocked(db.invoice.findFirst).mockResolvedValue({ ...mockInvoice, remindersEnabled: false } as never)
+
+    const result = await toggleRemindersAction('inv_1', true)
+
+    expect(db.invoice.update).toHaveBeenCalledWith({
+      where: { id: 'inv_1' },
+      data: { remindersEnabled: true },
+    })
+    expect(result).toEqual({ success: true })
+  })
+})
+
+describe('pauseAllRemindersAction', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('returns error if user is not authenticated', async () => {
+    vi.mocked(currentUser).mockResolvedValue(null)
+
+    const result = await pauseAllRemindersAction(false)
+    expect(result).toEqual({ error: 'Not authenticated' })
+  })
+
+  it('bulk-updates all user invoices to remindersEnabled=false', async () => {
+    vi.mocked(currentUser).mockResolvedValue(mockClerkUser)
+    vi.mocked(db.user.findUniqueOrThrow).mockResolvedValue(mockDbUser as never)
+
+    const result = await pauseAllRemindersAction(false)
+
+    expect(db.invoice.updateMany).toHaveBeenCalledWith({
+      where: { userId: 'user_1' },
+      data: { remindersEnabled: false },
+    })
+    expect(result).toEqual({ success: true })
+  })
+
+  it('bulk-updates all user invoices to remindersEnabled=true', async () => {
+    vi.mocked(currentUser).mockResolvedValue(mockClerkUser)
+    vi.mocked(db.user.findUniqueOrThrow).mockResolvedValue(mockDbUser as never)
+
+    const result = await pauseAllRemindersAction(true)
+
+    expect(db.invoice.updateMany).toHaveBeenCalledWith({
+      where: { userId: 'user_1' },
+      data: { remindersEnabled: true },
+    })
+    expect(result).toEqual({ success: true })
   })
 })

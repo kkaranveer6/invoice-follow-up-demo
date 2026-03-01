@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useSyncExternalStore } from 'react'
-import { LayoutDashboard, Menu, Settings, Users } from 'lucide-react'
+import { FileText, LayoutDashboard, Menu, Settings, Users } from 'lucide-react'
 import { UserButton } from '@clerk/nextjs'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -17,6 +17,7 @@ import {
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/customers', label: 'Customers', icon: Users },
+  { href: '/dashboard/invoices', label: 'Invoices', icon: FileText },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]
 
