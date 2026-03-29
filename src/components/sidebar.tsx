@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useSyncExternalStore } from 'react'
 import { FileText, LayoutDashboard, Menu, Settings, Users } from 'lucide-react'
-import { UserButton } from '@clerk/nextjs'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -57,9 +56,6 @@ function SidebarContent() {
         })}
       </nav>
 
-      <div className="border-t px-4 py-4">
-        <UserButton />
-      </div>
     </div>
   )
 }
