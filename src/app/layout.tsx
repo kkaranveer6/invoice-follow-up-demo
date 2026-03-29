@@ -1,4 +1,3 @@
-import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 import { DM_Sans, Source_Sans_3 } from 'next/font/google'
 import './globals.css'
@@ -26,14 +25,26 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`${dmSans.variable} ${sourceSans.variable} antialiased`}
-        >
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <body className={`${dmSans.variable} ${sourceSans.variable} antialiased`}>
+        <div style={{
+          background: '#0ea5e9',
+          color: '#fff',
+          textAlign: 'center',
+          padding: '8px',
+          fontSize: '13px',
+          fontWeight: 500,
+        }}>
+          Demo mode — all data is fictional.{' '}
+          <a
+            href="https://github.com/kkaranveer6/invoice-follow-up-demo"
+            style={{ color: '#fff', textDecoration: 'underline' }}
+          >
+            View source on GitHub
+          </a>
+        </div>
+        {children}
+      </body>
+    </html>
   )
 }
