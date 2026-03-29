@@ -11,10 +11,10 @@ export default function Home() {
           <span className="font-heading text-lg font-bold text-indigo-600">Invoice Follow-Up</span>
           <div className="flex items-center gap-3">
             <Button variant="ghost" asChild className="hidden sm:inline-flex">
-              <Link href="/sign-in">Sign In</Link>
+              <Link href="/dashboard">Sign In</Link>
             </Button>
             <Button asChild>
-              <Link href="/sign-up">Get Started</Link>
+              <Link href="/dashboard">Get Started</Link>
             </Button>
           </div>
         </div>
@@ -31,10 +31,10 @@ export default function Home() {
           </p>
           <div className="mt-10 flex items-center justify-center gap-4">
             <Button asChild>
-              <Link href="/sign-up">Get Started</Link>
+              <Link href="/dashboard">Get Started</Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href="/sign-in">Sign In</Link>
+              <Link href="/dashboard">Sign In</Link>
             </Button>
           </div>
           <p className="mt-8 text-sm text-slate-400">
@@ -120,7 +120,7 @@ export default function Home() {
               </li>
             </ul>
             <Button className="mt-8 w-full" asChild>
-              <Link href="/sign-up">Start free trial</Link>
+              <Link href="/dashboard">Start free trial</Link>
             </Button>
             <p className="mt-3 text-center text-xs text-slate-400">
               14-day free trial · No credit card required
