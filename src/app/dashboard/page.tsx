@@ -1,7 +1,4 @@
-import { currentUser } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
-import type { Invoice } from '@prisma/client'
-import { db } from '@/lib/db'
+import { DEMO_INVOICES, DEMO_STATS, type DemoInvoice } from '@/lib/demo-data'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -38,7 +35,7 @@ function daysOverdue(dueDate: Date): number {
 
 interface InvoiceSectionProps {
   title: string
-  invoices: Invoice[]
+  invoices: DemoInvoice[]
   badgeClass: string
   accentClass: string
   statusLabel: string
@@ -125,31 +122,9 @@ function InvoiceSection({
   )
 }
 
-export default async function DashboardPage() {
-  const user = await currentUser()
-  if (!user) redirect('/sign-in')
-
-  const dbUser = await db.user.findUnique({
-    where: { clerkId: user.id },
-  })
-
-  if (!dbUser || !dbUser.stripeConnected) {
-    redirect('/dashboard/settings')
-  }
-
-  const displayName = user.firstName ?? dbUser.email
-
-  const [invoiceCount, remindersSent, invoices] =
-    await Promise.all([
-      db.invoice.count({ where: { userId: dbUser.id } }),
-      db.emailLog.count({
-        where: { invoice: { userId: dbUser.id }, status: 'sent' },
-      }),
-      db.invoice.findMany({
-        where: { userId: dbUser.id },
-        orderBy: { dueDate: 'asc' },
-      }),
-    ])
+export default function DashboardPage() {
+  const invoices = DEMO_INVOICES
+  const { invoiceCount, remindersSent, lastSyncedAt } = DEMO_STATS
 
   const overdue = invoices.filter((i) => i.status === 'overdue')
   const unpaid = invoices.filter((i) => i.status === 'unpaid')
@@ -161,7 +136,7 @@ export default async function DashboardPage() {
         Dashboard
       </h1>
       <p className="mt-1 text-sm text-slate-600">
-        Welcome back, {displayName}
+        Welcome back, Demo User
       </p>
 
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -192,7 +167,7 @@ export default async function DashboardPage() {
           <CardContent>
             <p className="text-2xl font-bold text-slate-900">{invoiceCount}</p>
             <div className="mt-3">
-              <SyncButton lastSyncedAt={dbUser.lastSyncedAt} />
+              <SyncButton lastSyncedAt={lastSyncedAt} />
             </div>
           </CardContent>
         </Card>
