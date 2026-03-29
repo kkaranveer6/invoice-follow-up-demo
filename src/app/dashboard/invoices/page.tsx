@@ -1,6 +1,4 @@
-import { currentUser } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
-import { db } from '@/lib/db'
+import { DEMO_INVOICES, type DemoInvoice, type InvoiceStatus } from '@/lib/demo-data'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -13,7 +11,6 @@ import {
 } from '@/components/ui/table'
 import { ReminderToggle } from '@/components/reminder-toggle'
 import { FileText } from 'lucide-react'
-import { InvoiceStatus } from '@prisma/client'
 
 function formatAmount(amount: number, currency: string): string {
   return new Intl.NumberFormat('en-US', {
@@ -40,35 +37,17 @@ function StatusBadge({ status }: { status: InvoiceStatus }) {
   return <Badge variant="secondary" className="bg-amber-100 text-amber-700">Unpaid</Badge>
 }
 
-export default async function InvoicesPage() {
-  const user = await currentUser()
-  if (!user) redirect('/sign-in')
-
-  const dbUser = await db.user.findUnique({
-    where: { clerkId: user.id },
-  })
-
-  if (!dbUser || !dbUser.stripeConnected) {
-    redirect('/dashboard/settings')
-  }
-
-  const invoices = await db.invoice.findMany({
-    where: { userId: dbUser.id },
-    orderBy: { dueDate: 'asc' },
-  })
+export default function InvoicesPage() {
+  const invoices = DEMO_INVOICES
 
   if (invoices.length === 0) {
     return (
       <div>
         <h1 className="font-heading text-2xl font-bold text-slate-900">Invoices</h1>
-
         <Card className="mt-6">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <FileText className="h-12 w-12 text-slate-400" />
             <p className="mt-4 text-lg font-medium text-slate-900">No invoices found</p>
-            <p className="mt-1 text-sm text-slate-600">
-              Invoices will appear here once they are synced from Stripe.
-            </p>
           </CardContent>
         </Card>
       </div>
