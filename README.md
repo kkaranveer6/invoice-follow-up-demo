@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Invoice Follow-Up
+
+> Automated invoice reminder system — never chase payments manually again.
+
+A demo SaaS application that connects to Stripe and automatically sends escalating email reminders to clients for overdue invoices. All data is fictional and for portfolio/demo purposes.
+
+**Live demo:** [karanveer.github.io/invoice-follow-up-demo](https://karanveer.github.io/invoice-follow-up-demo)
+
+---
+
+## Features
+
+### Automated Reminders
+- Detects overdue invoices by syncing with Stripe
+- Sends up to 3 escalating email reminders per invoice (friendly nudge → firm follow-up → final notice)
+- Per-invoice toggle to pause/resume reminders
+
+### Dashboard
+- Overview cards: Stripe connection status, total invoices synced, reminders sent, overdue count
+- Invoice table organized by status: **Overdue**, **Unpaid**, **Paid**
+- Each row shows customer name, amount, due date, last reminder sent, and reminder count
+
+### Customer Management
+- Customer list with invoice summaries broken down by status (Draft, Open, Paid, Void, Uncollectible)
+
+### Billing
+- 14-day free trial, $29/month Pro plan
+- Billing success and cancellation pages
+
+---
+
+## Tech Stack
+
+| Category | Technology |
+|----------|-----------|
+| Framework | Next.js (App Router), React 19 |
+| Styling | Tailwind CSS 4, clsx, tailwind-merge |
+| UI Components | Radix UI, Lucide React, shadcn/ui-style components |
+| Variant System | Class Variance Authority (CVA) |
+| Fonts | DM Sans (headings), Source Sans 3 (body) |
+| Language | TypeScript |
+| Testing | Vitest |
+| Linting | ESLint 9, Prettier |
+| Deployment | Static export → GitHub Pages |
+
+---
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── page.tsx                  # Landing page
+│   ├── pricing/                  # Pricing page
+│   ├── billing/success|cancel/   # Post-checkout pages
+│   ├── privacy/ & terms/         # Legal pages
+│   └── dashboard/
+│       ├── page.tsx              # Main dashboard
+│       ├── customers/            # Customer list
+│       ├── invoices/             # Invoice list
+│       └── settings/             # Account & integrations
+├── components/
+│   ├── sidebar.tsx               # Responsive sidebar (desktop fixed, mobile sheet)
+│   ├── reminder-toggle.tsx       # Per-invoice pause/resume toggle
+│   └── ui/                       # Reusable component library
+└── lib/
+    └── demo-data.ts              # Sample invoices, customers, and stats
+```
+
+---
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Other commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build    # Static export to /out
+npm test         # Run unit tests (Vitest)
+npm run lint     # ESLint
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- This is a **demo only** — all invoice and customer data is fictional
+- No backend or real Stripe connection; a production version would use the Stripe API and a database (Prisma schema included as reference)
+- A blue banner is shown in the app to indicate demo mode
